@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from telebot import types
 
 start_markup = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)
