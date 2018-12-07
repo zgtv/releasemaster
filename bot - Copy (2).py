@@ -5,9 +5,7 @@ import markups as m
 #main variables
 TOKEN = "634318196:AAFO38miyi9DQg3o_mf39WFrdWRmTQoKzig"
 bot = telebot.TeleBot(TOKEN)
-build = ""
-stand = ""
-
+deploy = {}
 
 #@bot.message_handler(commands=['start', 'go', '17'])
 @bot.message_handler(commands=['start'])
@@ -15,26 +13,6 @@ def start_handler(message):
     chat_id = message.chat.id
     msg = bot.send_message(chat_id, 'Посмотреть текущее состояние или обновляем стенд?', reply_markup=m.start_markup)
 
-@bot.message_handler(commands=['all'])
-def showAll(message):
-    f = open("ZOE.txt", 'r')
-    zoe = f.read()
-    f.close
-    f = open("ZPE.txt", 'r')
-    zpe = f.read()
-    f.close
-    f = open("17.txt", 'r')
-    s17 = f.read()
-    f.close
-    f = open("Test-4.txt", 'r')
-    test4 = f.read()
-    f.close
-    f = open("Test-5.txt", 'r')
-    test5 = f.read()
-    f.close
-    chat_id = message.chat.id
-    text = message.text
-    msg = bot.send_message(chat_id, "На настоящий момент установлено\n17-й сервер: " + s17 + "\nTest-4: " + test4 + "\nTest-5: " + test5 + "\nЗОЭ: " + zoe + "\nЗПЭ: " + zpe, reply_markup=telebot.types.ReplyKeyboardRemove())
 
 @bot.message_handler(commands=['deploy'])
 def askSource(message):
@@ -50,14 +28,18 @@ def askSource(message):
     bot.register_next_step_handler(msg, askBuild)
 
 def askBuild(message):
-    global stand
     chat_id = message.chat.id
     text = message.text
-    stand = message.text
+    deploy[chat_id] = [text]
+    build = list(deploy.values())
+    stand = build [0]
+    file_name = str(build [0]) + '.txt'
     print("--------------------------------------------------------------")
     print("ID чата: ", chat_id)
     print("Текущий текст: ", text)
-    print("Стенд:", stand)
+    print("Билд: ", build)
+    print("Стенд :", stand)
+    print("Имя файла: ", file_name)
     print("Юзер ID", message.from_user.id)
     print("Юзернейм", message.from_user.username)
     print("--------------------------------------------------------------")
@@ -66,26 +48,41 @@ def askBuild(message):
 
 #@bot.message_handler(commands=['write'])
 def wrtBuild(message):
-    global build
-    global stand
     chat_id = message.chat.id
     text = message.text
-    file_name = str(stand) + '.txt'
-    build = message.text
+    deploy[chat_id].append(text)
+    build = list(deploy.values())
+    file_name = str(build [0]) + '.txt'
+    stand = build [0]
+#    buildNum = build[1]
     print("--------------------------------------------------------------")
     print("ID чата: ", chat_id)
     print("Текущий текст: ", text)
-    print("Стенд: ", stand)
     print("Билд: ", build)
+#    print("Номер билда: ", buildNum)
+#    print("Выбранный стенд: ", deploy[chat_id].values(1))
     print("Имя файла: ", file_name)
     print("Юзер ID", message.from_user.id)
     print("Юзернейм", message.from_user.username)
+    print("Ключи словаря", deploy.keys())
+    print("Значения словаря", deploy.values())
+    print("Словарь", deploy.items())
     print("--------------------------------------------------------------")
-    msg = bot.send_message(message.from_user.id, "Стенд " + stand + " обновился до версии " + build)
-    f = open(file_name, 'w')
-    f.write(build)
-    f.close
+    msg = bot.send_message(message.from_user.id, "Выбранный стенд: " + stand)
+#    f = open(file_name, 'w')
+#    f.write('Версия в ' + stand + ": " + build + ", установлена " + message.from_user.username)
+#    f.close
+    
 
+
+# def askName(message):
+#     chat_id = message.chat.id
+#     text = message.text
+#     if not text.isdigit():
+#         msg = bot.send_message(chat_id, 'Я хочу число')
+#         bot.register_next_step_handler(msg, askName)
+#         return
+#     msg = bot.send_message(chat_id, 'Спасибо, я запомнил что число: ' + text)
 
 @bot.message_handler(commands=['show'])
 def shwMess(message):
